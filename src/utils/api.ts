@@ -20,7 +20,8 @@ export const fetchAirQualityData = async () => {
       aqi: Math.floor(Math.random() * 150) + 10, // Random AQI between 10 and 160
       temperature: Math.floor(Math.random() * 15) + 20, // Random temp between 20 and 35
       humidity: Math.floor(Math.random() * 40) + 40, // Random humidity between 40% and 80%
-      category: getRandomCategory()
+      category: getRandomCategory(),
+      isMockData: true
     };
     
   } catch (error) {
