@@ -8,6 +8,7 @@ import LastUpdated from '../components/LastUpdated';
 import AQIDescription from '../components/AQIDescription';
 import { fetchAirQualityData, reverseGeocode } from '../utils/api';
 import { generateForecast, getAQICategory } from '../utils/formatters';
+import { toast } from '../hooks/use-toast';
 
 const REFRESH_INTERVAL = 5000; // 5 seconds
 
@@ -28,6 +29,8 @@ const Index: React.FC = () => {
   
   // State for loading status
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  // State to track if we're using mock data
+  const [usingMockData, setUsingMockData] = useState<boolean>(false);
 
   // Function to get user's location
   const getUserLocation = useCallback(async () => {
@@ -63,11 +66,20 @@ const Index: React.FC = () => {
       setIsLoading(true);
       const data = await fetchAirQualityData();
       
+      // Check if we're using mock data
+      if (data.hasOwnProperty('isMockData') && data.isMockData === true && !usingMockData) {
+        setUsingMockData(true);
+        toast({
+          title: "Using simulated data",
+          description: "Could not connect to the air quality sensor. Using simulated data instead.",
+        });
+      }
+
       // Update state with new data
       setAqi(data.aqi);
       setTemperature(data.temperature);
       setHumidity(data.humidity);
-      setCategory(data.category);
+      setCategory(data.category || getAQICategory(data.aqi));
       
       // Generate forecast based on current AQI
       setForecast(generateForecast(data.aqi));
@@ -79,7 +91,7 @@ const Index: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [usingMockData]);
 
   // On component mount, get user location and fetch initial data
   useEffect(() => {
