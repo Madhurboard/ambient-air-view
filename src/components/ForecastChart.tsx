@@ -24,15 +24,20 @@ interface ForecastChartProps {
 }
 
 const ForecastChart: React.FC<ForecastChartProps> = ({ data, currentAQI }) => {
-  // Generate multiple trend lines for different locations
+  // Generate multiple trend lines for different locations with more natural patterns
   const getAreaData = () => {
-    return data.map(point => {
+    return data.map((point, index) => {
+      // Create fluctuations that are consistent for each location across time
+      const hadapsarFactor = 0.9 + (Math.sin(index * 0.5) * 0.2);
+      const bhosariFactor = 1.2 + (Math.cos(index * 0.4) * 0.3);
+      const vimanNagarFactor = 0.8 + (Math.sin(index * 0.7 + 2) * 0.25);
+      
       return {
         time: point.time,
         "Loni Kalbhor": point.aqi,
-        "Hadapsar": Math.round(point.aqi * (0.9 + Math.random() * 0.4)),
-        "Bhosari": Math.round(point.aqi * (0.8 + Math.random() * 0.7)),
-        "Viman Nagar": Math.round(point.aqi * (1.0 + Math.random() * 0.5))
+        "Hadapsar": Math.round(point.aqi * hadapsarFactor),
+        "Bhosari": Math.round(point.aqi * bhosariFactor),
+        "Viman Nagar": Math.round(point.aqi * vimanNagarFactor)
       };
     });
   };
